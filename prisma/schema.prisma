@@ -1,0 +1,50 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                 String        @id @default(cuid())
+  clerkUserId        String        @unique
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  selectedPreferences String[]
+  customPreferences  String?
+  pantryItems        PantryItem[]
+  savedRecipes       SavedRecipe[]
+}
+
+model PantryItem {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  quantity   Float
+  unit       String
+  category   String
+  expiryDate String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model SavedRecipe {
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeId           String
+  title              String
+  prepTimeMinutes    Int
+  recipeTier         String
+  instructions       String[]
+  chefTip            String?
+  ayurvedicPurityTag String?
+  createdAt          DateTime @default(now())
+
+  @@index([userId])
+}
